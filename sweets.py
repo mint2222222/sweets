@@ -36,6 +36,7 @@ BITE = 0.2
 SCALE = 1.2  # desserts are modelled a bit small for the plate
 HINT = "space next  e eat  r serve again  c clock  s screensaver  +/- speed  q quit"
 SIDE, FLOOR = 0, 0  # room kept free for the --peaks curtains and floor
+HIDDEN = {"cherrypie"}  # not on the menu; you have to know to ask
 PEAKS_LINES = [
     "damn fine cherry pie",
     "and a cup of coffee, black as midnight on a moonless night",
@@ -372,8 +373,9 @@ def run(scr, args, ids, idx):
 
 def main():
     p = argparse.ArgumentParser(prog="sweets", description=__doc__)
-    p.add_argument("dessert", nargs="?", choices=list(models.DESSERTS), metavar="dessert",
-                   help="which dessert to serve: " + ", ".join(models.DESSERTS))
+    menu = [d for d in models.DESSERTS if d not in HIDDEN]
+    p.add_argument("dessert", nargs="?", metavar="dessert",
+                   help="which dessert to serve: " + ", ".join(menu))
     p.add_argument("-l", "--list", action="store_true", help="list the desserts")
     p.add_argument("-r", "--random", action="store_true", help="serve a random dessert")
     p.add_argument("-b", "--birthday", nargs="?", const="", metavar="NAME", help="birthday cake, optionally for NAME")
@@ -381,19 +383,21 @@ def main():
     p.add_argument("-c", "--clock", action="store_true", help="show a clock in the corner")
     p.add_argument("--color", nargs="?", const="gruvbox", choices=list(THEMES),
                    help="colour theme: gruvbox (default), term (your terminal's own palette), amber, green")
-    p.add_argument("--peaks", action="store_true", help="cherry pie and black coffee, in the red room")
+    p.add_argument("--peaks", action="store_true", help=argparse.SUPPRESS)  # a damn fine easter egg
     p.add_argument("--once", action="store_true", help="spin one full turn, then exit")
     p.add_argument("--speed", type=float, default=0.35, help="spin speed (default 0.35)")
     args = p.parse_args()
 
-    ids = list(models.DESSERTS)
+    if args.dessert and args.dessert not in models.DESSERTS:
+        p.error(f"no dessert called {args.dessert!r}. try: {', '.join(menu)}")
     if args.list:
-        print("\n".join(ids))
+        print("\n".join(menu))
         return
     if args.peaks:
         global SIDE, FLOOR
         SIDE, FLOOR, args.clock = 9, 3, True
     want = "birthday" if args.birthday is not None else "cherrypie" if args.peaks else args.dessert
+    ids = menu + [want] if want in HIDDEN else menu
     idx = ids.index(want) if want else random.randrange(len(ids)) if args.random else 0
     try:
         curses.wrapper(run, args, ids, idx)
