@@ -91,4 +91,4 @@ python3 test_sweets.py
 
 ---
 
-<sub><i>the owls are not what they seem.</i></sub>
+<sub><i>the owls are not what they seem.🦉</i></sub>
