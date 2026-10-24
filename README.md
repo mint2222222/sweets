@@ -1,7 +1,7 @@
 # 🍰 sweets
 
-A plate of desserts slowly spinning in your terminal, rendered in 3D ASCII. A toy, like `sl`:
-it does nothing useful, it just looks nice while you take a break.
+A plate of desserts slowly spinning in your terminal, rendered in 3D ASCII.
+it does nothing useful, it just looks nice while you take a break and also works for putting things up in linux rices i guess.
 
 ## Installation
 
